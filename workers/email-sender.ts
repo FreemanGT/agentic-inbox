@@ -34,7 +34,7 @@ export interface SendEmailParams {
  *
  * @param binding  - The `EMAIL` SendEmail binding from env
  * @param params   - Email parameters (to, from, subject, body, etc.)
- * @returns The send result with messageId
+ * @returns The Message-ID Email Service assigned to the message (no angle brackets)
  * @throws On validation or delivery errors (error has `.code` property)
  */
 export async function sendEmail(
@@ -68,5 +68,7 @@ export async function sendEmail(
 	}
 
 	const result = await binding.send(message as any);
-	return { messageId: result.messageId };
+	// Message-ID is platform-controlled (ours is rejected), so this is the id a
+	// recipient's reply will reference. Stored bracket-less like every other id.
+	return { messageId: (result.messageId ?? "").replace(/^<|>$/g, "") };
 }
